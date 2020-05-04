@@ -19,7 +19,6 @@ class HashTable:
 
     def __init__(self, capacity):
         self.storage = [None] * capacity
-        self.sll = None
 
     @property
     def capacity(self):
