@@ -42,10 +42,9 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        total = 0
+        total = 5381
         for b in key.encode():
-            total ^= b
-            total &= 0xffffffff
+            total = total * 33 + b
         return total
 
     def hash_index(self, key):
@@ -53,8 +52,8 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        index = self.fnv1(key) % self.capacity
-        # index self.djb2(key) % self.capacity
+        # index = self.fnv1(key) % self.capacity
+        index = self.djb2(key) % self.capacity
         return index
 
     def put(self, key, value):
@@ -72,22 +71,20 @@ class HashTable:
         else:
             # There is a node? Now we must check if our key
             # is the same, or if we need to create a new node
-            previous_node = None
             current_node = self.storage[index]
             while True:
-                if current_node is None:
-                    # If we didn't find a node with our given key,
-                    # Create one!
-                    previous_node.next = HashTableEntry(key, value)
-                    return
-                elif current_node.key == key:
+                if current_node.key == key:
                     # If we find a node with our given key,
                     # Overwrite its value
                     current_node.value = value
                     return
+                elif current_node.next is None:
+                    # If we didn't find a node with our given key,
+                    # Create one!
+                    current_node.next = HashTableEntry(key, value)
+                    return
                 else:
                     # Otherwise, keep chaining down our nodes
-                    previous_node = current_node
                     current_node = current_node.next
 
     def delete(self, key):
@@ -110,7 +107,7 @@ class HashTable:
                     # remove the pointer from the previous node
                     current_node.value = None
                     if previous_node:
-                        previous_node.next = None
+                        previous_node.next = current_node.next
                     return
                 else:
                     previous_node = current_node
