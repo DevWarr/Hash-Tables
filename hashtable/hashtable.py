@@ -4,9 +4,9 @@ class HashTableEntry:
     """
 
     def __init__(self, key, value):
-        self.key = key
+        self.key   = key
         self.value = value
-        self.next = None
+        self.next  = None
 
 
 class HashTable:
@@ -18,11 +18,29 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        self.storage = [None] * capacity
+        self.storage   = [None] * capacity
+        self.__true_size = 0
+        self.min_size  = 8
 
     @property
     def capacity(self):
         return len(self.storage)
+
+    @property
+    def size(self):
+        return self.__true_size
+
+    def increase_size(self):
+        self.__true_size += 1
+        print(f"Size: {self.size}\nCapacity: {self.capacity}")
+        if self.__true_size / self.capacity >= 0.7:
+            self.resize()
+
+    def decrease_size(self):
+        self.__true_size -= 1
+        print(f"Size: {self.size}\nCapacity: {self.capacity}")
+        if self.__true_size / self.capacity <= 0.2:
+            self.resize(1)
 
     def fnv1(self, key):
         """
@@ -68,6 +86,7 @@ class HashTable:
         if self.storage[index] is None:
             # No node at the index? Create one
             self.storage[index] = HashTableEntry(key, value)
+            self.increase_size()
         else:
             # There is a node? Now we must check if our key
             # is the same, or if we need to create a new node
@@ -82,6 +101,7 @@ class HashTable:
                     # If we didn't find a node with our given key,
                     # Create one!
                     current_node.next = HashTableEntry(key, value)
+                    self.increase_size()
                     return
                 else:
                     # Otherwise, keep chaining down our nodes
@@ -108,6 +128,7 @@ class HashTable:
                     current_node.value = None
                     if previous_node:
                         previous_node.next = current_node.next
+                    self.decrease_size()
                     return
                 else:
                     previous_node = current_node
@@ -137,17 +158,23 @@ class HashTable:
         # no node found? Return None
         return None
 
-    def resize(self):
+    def resize(self, grow_or_shrink=0):
         """
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
+        Doubles or halves the capacity of the hash table and
+        rehashes all key/value pairs.
 
-        Implement this.
+            grow_or_shrink: 0 grow | 1 shrink
         """
 
         # Hold onto old storage so we can rehash our values
+        print(f"resizing: {'shrinking' if grow_or_shrink == 1 else 'growing'}")
         old_storage = self.storage
-        self.storage = [None] * self.capacity * 2
+        if grow_or_shrink == 1:
+            self.storage = [None] * (self.capacity // 2)
+        else:
+            self.storage = [None] * self.capacity * 2
+        # Reset our size so we start resizing at 0 again
+        self.__true_size = 0
         for val in old_storage:
             if val is not None:
                 # If our value exists,
