@@ -32,13 +32,11 @@ class HashTable:
 
     def increase_size(self):
         self.__true_size += 1
-        print(f"Size: {self.size}\nCapacity: {self.capacity}")
         if self.__true_size / self.capacity >= 0.7:
             self.resize()
 
     def decrease_size(self):
         self.__true_size -= 1
-        print(f"Size: {self.size}\nCapacity: {self.capacity}")
         if self.__true_size / self.capacity <= 0.2:
             self.resize(1)
 
@@ -167,7 +165,6 @@ class HashTable:
         """
 
         # Hold onto old storage so we can rehash our values
-        print(f"resizing: {'shrinking' if grow_or_shrink == 1 else 'growing'}")
         old_storage = self.storage
         if grow_or_shrink == 1:
             self.storage = [None] * (self.capacity // 2)
