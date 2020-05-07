@@ -1,9 +1,8 @@
 import random
-import re
 
 # Read in all the words in one go
 with open("input.txt") as f:
-    words = re.split('\s+', f.read())
+    words = f.read().split()
 
 # TODO: analyze which words can follow other words
 word_and_followers = {}
