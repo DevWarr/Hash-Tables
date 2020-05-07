@@ -1,5 +1,17 @@
+import re
+
 def word_count(s):
-    # Implement me.
+    words = {}
+    s_arr = re.split('[\s":;,.\-+=/\\\|[\]{}()*^&]+', s.lower())
+    for word in s_arr:
+        if len(word) == 0:
+            continue
+        if words.get(word):
+            words[word] += 1
+        else:
+            words[word] = 1
+    print(words)
+    return words
 
 
 if __name__ == "__main__":
