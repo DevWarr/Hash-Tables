@@ -32,11 +32,13 @@ class HashTable:
 
     def increase_size(self):
         self.__true_size += 1
+        print(f"Size: {self.size}\nCapacity: {self.capacity}")
         if self.__true_size / self.capacity >= 0.7:
             self.resize()
 
     def decrease_size(self):
         self.__true_size -= 1
+        print(f"Size: {self.size}\nCapacity: {self.capacity}")
         if self.__true_size / self.capacity <= 0.2:
             self.resize(1)
 
@@ -115,6 +117,15 @@ class HashTable:
         """
         index = self.hash_index(key)
         if self.storage[index] is not None:
+
+            if self.storage[index].key == key:
+                if self.storage[index].next is not None:
+                    self.storage[index] = self.storage[index].next
+                    return self.decrease_size()
+                else:
+                    self.storage[index] = None
+                    return self.decrease_size()
+            
             # If we find a node,
             # then chain down to find a node with the given key.
             previous_node = None
@@ -123,9 +134,9 @@ class HashTable:
                 if current_node.key == key:
                     # If we find a node that matches the given key,
                     # remove the pointer from the previous node
-                    current_node.value = None
                     if previous_node:
                         previous_node.next = current_node.next
+                    current_node = None
                     self.decrease_size()
                     return
                 else:
@@ -165,6 +176,7 @@ class HashTable:
         """
 
         # Hold onto old storage so we can rehash our values
+        print(f"resizing: {'shrinking' if grow_or_shrink == 1 else 'growing'}")
         old_storage = self.storage
         if grow_or_shrink == 1:
             self.storage = [None] * (self.capacity // 2)
@@ -197,13 +209,17 @@ if __name__ == "__main__":
     print(ht.get("line_3"))
 
     # Test resizing
-    old_capacity = len(ht.storage)
-    ht.resize()
-    new_capacity = len(ht.storage)
+    # old_capacity = len(ht.storage)
+    # ht.resize()
+    # new_capacity = len(ht.storage)
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
+    ht.delete("line_1")
+    ht.delete("line_2")
+    ht.delete("line_3")
+
     print(ht.get("line_1"))
     print(ht.get("line_2"))
     print(ht.get("line_3"))
